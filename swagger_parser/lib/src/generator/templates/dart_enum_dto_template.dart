@@ -59,9 +59,12 @@ String _dartEnumDartMappableTemplate(
   final jsonParam = unknownEnumValue || enumsToJson;
 
   final values =
-      '${enumClass.items.mapIndexed((i, e) => _enumValueDartMappable(i, enumClass.type, e, jsonParam: jsonParam)).join(
-            ',\n',
-          )}${unknownEnumValue ? ',' : ';'}';
+      '${enumClass.items.mapIndexed((i, e) => _enumValueDartMappable(i, enumClass.type, e, jsonParam: jsonParam)).join(',\n')}${unknownEnumValue ? ',' : ';'}';
+  final unknownEnumValueStr = unknownEnumValue ? _unkownEnumValue(true) : '';
+  final jsonFieldStr = jsonParam ? _jsonField(enumClass, unknownEnumValue) : '';
+  final constructorStr = jsonParam ? _constructor(className) : '';
+  final toJsonStr =
+      enumsToJson ? _toJson(enumClass, className, unknownEnumValue) : '';
 
   return '''
 ${generatedFileComment(
