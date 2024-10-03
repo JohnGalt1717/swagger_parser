@@ -59,12 +59,9 @@ String _dartEnumDartMappableTemplate(
   final jsonParam = unknownEnumValue || enumsToJson;
 
   final values =
-      '${enumClass.items.mapIndexed((i, e) => _enumValueDartMappable(i, enumClass.type, e, jsonParam: jsonParam)).join(',\n')}${unknownEnumValue ? ',' : ';'}';
-  final unknownEnumValueStr = unknownEnumValue ? _unkownEnumValue(true) : '';
-  final jsonFieldStr = jsonParam ? _jsonField(enumClass, unknownEnumValue) : '';
-  final constructorStr = jsonParam ? _constructor(className) : '';
-  final toJsonStr =
-      enumsToJson ? _toJson(enumClass, className, unknownEnumValue) : '';
+      '${enumClass.items.mapIndexed((i, e) => _enumValueDartMappable(i, enumClass.type, e, jsonParam: jsonParam)).join(
+            ',\n',
+          )}${unknownEnumValue ? ',' : ';'}';
 
   return '''
 ${generatedFileComment(
@@ -116,9 +113,16 @@ String _enumValue(
   required bool jsonParam,
 }) {
   final protectedJsonKey = protectJsonKey(item.jsonKey);
+  final value = type == 'string'
+      ? "'$protectedJsonKey'"
+      : protectedJsonKey?.isEmpty ?? true
+          ? "''"
+          : protectedJsonKey;
+
+  final name = item.name.isEmpty ? 'empty' : item.name;
   return '''
-${index != 0 ? '\n' : ''}${descriptionComment(item.description, tab: '  ')}  @JsonValue(${type == 'string' ? "'$protectedJsonKey'" : protectedJsonKey})
-  ${item.name.toCamel}${jsonParam ? '(${type == 'string' ? "'$protectedJsonKey'" : protectedJsonKey})' : ''}''';
+${index != 0 ? '\n' : ''}${descriptionComment(item.description, tab: '  ')}  @JsonValue($value)
+  ${name.toCamel}${jsonParam ? '($value)' : ''}''';
 }
 
 String _enumValueDartMappable(

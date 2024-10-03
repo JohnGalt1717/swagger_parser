@@ -1,3 +1,37 @@
+## 1.19.1
+- Fix generation with `anyOf`, `oneOf` and `allOf` properties
+
+## 1.19.0
+- Add version getter to root client:
+```dart
+final version = RestClient.version;
+```
+- Add `dio_options_parameter_by_default`
+
+## 1.18.3
+- Remove support of BigInt in Dart for `int64` types
+
+## 1.18.2
+- Added support for `int64` types
+
+## 1.18.1
+- Fix errors with `nullable: false`
+- Fix same property name conflict([#235](https://github.com/Carapacik/swagger_parser/issues/235))
+
+## 1.18.0
+- Handle empty enum value case ([#238](https://github.com/Carapacik/swagger_parser/pull/238))
+- Some fixes for the replacement rules
+- Support for nullable lists and maps
+- Remove config parameter `required_by_default`, behaviour is now consistent `required_by_default: false`
+- Requires Dart 3.4
+
+## 1.17.3
+
+- Fixed unnecessary null types with `required_by_default: false`
+- Fixed generation of class parameters that are set directly from the request specification ([#224](https://github.com/Carapacik/swagger_parser/issues/224))
+- Fixed changing case and applying replacement rules to class names ([#223](https://github.com/Carapacik/swagger_parser/issues/223))
+- Maps with `additionalProperties` are now generated correctly ([#214](https://github.com/Carapacik/swagger_parser/issues/214))
+
 ## 1.17.2
 
 - Add `MappableField` to dart_mappable template

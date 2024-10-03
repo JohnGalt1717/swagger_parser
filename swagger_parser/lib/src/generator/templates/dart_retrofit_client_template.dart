@@ -13,11 +13,14 @@ String dartRetrofitClientTemplate({
   required bool markFileAsGenerated,
   required String defaultContentType,
   bool extrasParameterByDefault = false,
+  bool dioOptionsParameterByDefault = false,
   bool originalHttpResponse = false,
 }) {
   final sb = StringBuffer(
     '''
-${generatedFileComment(markFileAsGenerated: markFileAsGenerated)}${_convertImport(restClient)}${_fileImport(restClient)}import 'package:dio/dio.dart'${_hideHeaders(restClient, defaultContentType)};
+${generatedFileComment(markFileAsGenerated: markFileAsGenerated)}${_convertImport(restClient)}${_fileImport(
+      restClient,
+    )}import 'package:dio/dio.dart'${_hideHeaders(restClient, defaultContentType)};
 import 'package:retrofit/retrofit.dart';
 ${dartImports(imports: restClient.imports, pathPrefix: '../models/')}
 part '${name.toSnake}.g.dart';
@@ -34,6 +37,7 @@ abstract class $name {
         defaultContentType,
         originalHttpResponse: originalHttpResponse,
         extrasParameterByDefault: extrasParameterByDefault,
+        dioOptionsParameterByDefault: dioOptionsParameterByDefault,
       ),
     );
   }
@@ -46,6 +50,7 @@ String _toClientRequest(
   String defaultContentType, {
   required bool originalHttpResponse,
   required bool extrasParameterByDefault,
+  required bool dioOptionsParameterByDefault,
 }) {
   final responseType = request.returnType == null
       ? 'void'
@@ -56,7 +61,9 @@ String _toClientRequest(
   ${descriptionComment(request.description, tabForFirstLine: false, tab: '  ', end: '  ')}${request.isDeprecated ? "@Deprecated('This method is marked as deprecated')\n  " : ''}${_contentTypeHeader(request, defaultContentType)}@${request.requestType.name.toUpperCase()}('${request.route}')
   Future<${originalHttpResponse ? 'HttpResponse<$responseType>' : responseType}> ${request.name}(''',
   );
-  if (request.parameters.isNotEmpty || extrasParameterByDefault) {
+  if (request.parameters.isNotEmpty ||
+      extrasParameterByDefault ||
+      dioOptionsParameterByDefault) {
     sb.write('{\n');
   }
   final sortedByRequired = List<UniversalRequestType>.from(
@@ -68,7 +75,12 @@ String _toClientRequest(
   if (extrasParameterByDefault) {
     sb.write(_addExtraParameter());
   }
-  if (request.parameters.isNotEmpty || extrasParameterByDefault) {
+  if (dioOptionsParameterByDefault) {
+    sb.write(_addDioOptionsParameter());
+  }
+  if (request.parameters.isNotEmpty ||
+      extrasParameterByDefault ||
+      dioOptionsParameterByDefault) {
     sb.write('  });\n');
   } else {
     sb.write(');\n');
@@ -94,6 +106,9 @@ String _fileImport(UniversalRestClient restClient) => restClient.requests.any(
         : '';
 
 String _addExtraParameter() => '    @Extras() Map<String, dynamic>? extras,\n';
+
+String _addDioOptionsParameter() =>
+    '    @DioOptions() RequestOptions? options,\n';
 
 String _toParameter(UniversalRequestType parameter) {
   var parameterType = parameter.type.toSuitableType(ProgrammingLanguage.dart);
